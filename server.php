@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 
 class WebsocketServer
@@ -365,7 +364,7 @@ abstract class WebsocketWorker
         /**
          * We have to check for large frames here. socket_recv cuts at 1024 bytes
          * so if websocket-frame is > 1024 bytes we have to wait until whole
-         * data is transferd.
+         * data is transferred.
          */
         if (strlen($data) < $dataLength) {
             return false;
@@ -395,7 +394,7 @@ abstract class WebsocketWorker
 
     abstract protected function onSend($data);
 
-    abstract protected function send($data);
+    abstract protected function send($message, $client);
 }
 
 //пример реализации чата
@@ -422,7 +421,7 @@ class WebsocketHandler extends WebsocketWorker
         //var_export($data);
         //шлем всем сообщение, о том, что пишет один из клиентов
         $message = 'пользователь #' . intval($client) . ' (' . $this->pid . '): ' . strip_tags($data['payload']);
-        $this->send($message);
+        $this->send($message, 0);
 
         $this->sendHelper($message);
     }
@@ -431,7 +430,7 @@ class WebsocketHandler extends WebsocketWorker
         $this->sendHelper($data);
     }
 
-    protected function send($message) {//отправляем сообщение на мастер, чтобы он разослал его на все воркеры
+    protected function send($message, $client) {//отправляем сообщение на мастер, чтобы он разослал его на все воркеры
         @fwrite($this->master, $message);
     }
 
@@ -441,6 +440,8 @@ class WebsocketHandler extends WebsocketWorker
         $write = $this->clients;
         if (stream_select($read, $write, $except, 0)) {
             foreach ($write as $client) {
+                print_r($client);
+                echo get_resource_type($client);
                 @fwrite($client, $data);
             }
         }
