@@ -18,9 +18,9 @@
     }
 
     window.add = function(topic) {
-        socket.send('{type:"subscribe","topic":"' + topic + '"}');
+        socket.send('{"type":"subscribe","topic":"' + topic + '"}');
     }
     window.push = function(topic) {
-        socket.send('{type:"push","topic":"' + topic + '"}');
+        socket.send('{"type":"push","topic":"' + topic + '"}');
     }
 </script>

@@ -4,6 +4,7 @@ class MySocketServer
     protected $socket;
     protected $clients = [];
     protected $changed;
+    protected $listenersMap = [];
 
     function __construct($host = 'localhost', $port = 9000)
     {
@@ -62,12 +63,46 @@ class MySocketServer
             $buffer = null;
             while(socket_recv($socket, $buffer, 10000, 0) >= 1) {
 
-                $buffer = $this->hybi10Decode($buffer)['payload'];
+                $request = $this->hybi10Decode($buffer)['payload'];
 
-                $this->broadbandMessage($this->hybi10Encode(trim($buffer), 'text', false) . PHP_EOL);
-                unset($this->changed[$key]);
+                //$this->broadbandMessage($this->hybi10Encode(trim($buffer), 'text', false) . PHP_EOL);
+                $request = json_decode($request);
+
+                if (!$request) {
+                    continue;
+                }
+
+                // handle request
+                switch ($request->type) {
+                    case 'subscribe':
+                        if (!isset($request->topic)) {
+                            return;
+                        }
+                        $this->listenersMap[
+                            $request->topic
+                        ][] = intval($socket);
+                        break;
+                    case 'unsubscribe':
+                        if (!isset($request->topic)) {
+                            return;
+                        }
+                        $key = array_search(intval($socket), $this->listenersMap);
+                        if ($key !== false) {
+                            unset($this->listenersMap[
+                                $request->topic
+                            ][$key]);
+                        }
+                        break;
+                    case 'push':
+                        if (!isset($request->topic)) {
+                            return;
+                        }
+                        $this->push($request->topic);
+                        break;
+                }
                 break;
             }
+            unset($this->changed[$key]);
         }
     }
 
@@ -82,12 +117,24 @@ class MySocketServer
             $found_socket = array_search($changed_socket, $this->clients);
             socket_getpeername($changed_socket, $ip);
             unset($this->clients[$found_socket]);
-            $response = 'client ' . $ip . ' has disconnected';
-            //$this->broadbandMessage($response);
         }
     }
 
-    function broadbandMessage($msg)
+    private function push($topic) {
+        $msg = json_encode(array(
+            'type' => 'push',
+        ));
+
+        $msg = $this->hybi10Encode($msg, 'text', false);
+
+        foreach($this->clients as $client) {
+            if (in_array(intval($client), $this->listenersMap[$topic])) {
+                socket_write($client,$msg,strlen($msg));
+            }
+        }
+    }
+
+    private function broadbandMessage($msg)
     {
         foreach(array_diff($this->clients, $this->changed) as $client)
         {
