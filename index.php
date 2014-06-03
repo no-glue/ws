@@ -8,6 +8,10 @@
         showMessage(incomingMessage);
     };
 
+    socket.onclose = function(closeEvent) {
+        console.log("reason " + closeEvent.reason + "code " + closeEvent.code);
+    };
+
     // показать сообщение в div#subscribe
     function showMessage(message) {
         console.log(message);
