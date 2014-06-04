@@ -18,7 +18,7 @@ You can install it by composer by modifying your composer.json:
         }
     ]
     
-Then run
+Then execute in terminal
 
     $ composer update
     
