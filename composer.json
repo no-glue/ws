@@ -2,7 +2,7 @@
     "name": "tirnak/ws",
     "description": "websocket lib",
     "minimum-stability": "stable",
-    "license": "proprietary",
+    "license": "GPL-3.0",
     "require": {
         "php":">=5.3.0"
     },
@@ -13,6 +13,6 @@
         }
     ],
     "autoload": {
-        "psr-0": {"ws": "./"}
+        "psr-0": {"WS": "./"}
     }
 }
