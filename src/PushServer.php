@@ -369,5 +369,3 @@ class MySocketServer
         $this->clients[] = $socket_new;
     }
 }
-
-(new MySocketServer('0.0.0.0', 8030))->run();
