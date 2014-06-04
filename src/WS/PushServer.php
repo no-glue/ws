@@ -120,6 +120,13 @@ class PushServer
             $found_socket = array_search($changed_socket, $this->clients);
             socket_getpeername($changed_socket, $ip);
             unset($this->clients[$found_socket]);
+            foreach($this->listenersMap as $topic => $listeners) {
+                $key = array_search(intval($changed_socket), $listeners);
+                if ($key !== false) {
+                    unset($this->listenersMap[$topic][$key]);
+                    $this->listenersMap[$topic] = array_values($this->listenersMap[$topic]);
+                }
+            }
         }
     }
 
