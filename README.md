@@ -5,6 +5,31 @@ WebSocket Push Server is a [PHP](http://php.net/) implementation of push server,
 
 This is simple, yet working version.
 
+You can install it by composer by modifying your composer.json:
+
+    "require": {
+        ...
+        "tirnak/ws" : "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:tirnak/ws.git"
+        }
+    ]
+    
+Then run
+
+    $ composer update
+    
+To run server, create new instance, like :
+
+    (new \WS\PushServer('192.168.0.1', 8030))->run();
+    
+or, to open port for everyone:
+
+    (new \WS\PushServer('0.0.0.0', 8030))->run();
+
 to start, I'd recommend:
 
     $ php server.php
