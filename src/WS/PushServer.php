@@ -2,7 +2,7 @@
 
 namespace WS;
 
-class MySocketServer
+class PushServer
 {
     protected $socket;
     protected $clients = [];
