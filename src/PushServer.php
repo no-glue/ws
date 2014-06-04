@@ -1,4 +1,7 @@
 <?php
+
+namespace WS;
+
 class MySocketServer
 {
     protected $socket;
